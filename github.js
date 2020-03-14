@@ -11,7 +11,9 @@ const useGitHub = (accessToken, owner, repo, branch, kernelName) => {
                 github.actions.listRepoWorkflowRuns({ owner, repo })
             ])
             const commitSha = branchData.data.commit.sha
-            return runs.data.workflow_runs.filter(run => run.head_sha === commitSha)[0].id
+            const runId = runs.data.workflow_runs.filter(run => run.head_sha === commitSha)[0].id
+            const artifactsResponse = await github.actions.listWorkflowRunArtifacts({ owner, repo, run_id: runId })
+            return artifactsResponse.data.artifacts[0].id
         },
 
         downloadArtifact: async artifactId => {
@@ -24,10 +26,13 @@ const useGitHub = (accessToken, owner, repo, branch, kernelName) => {
             return artifactResponce.data
         },
 
-        updateGist: (id, content) => github.gists.update(id, content),
+        updateGist: (id, files) => github.gists.update({
+            gist_id: id,
+            files
+        }),
 
-        createRelease: async (version, changelog, artficat, prerelease) => {
-            const release = await github.octokit.repos.createRelease({
+        createRelease: async (version, changelog, artifact, prerelease) => {
+            const release = await github.repos.createRelease({
                 owner, repo,
                 tag_name: `v${version}`,
                 name: version,
@@ -35,16 +40,16 @@ const useGitHub = (accessToken, owner, repo, branch, kernelName) => {
                 body: changelog,
                 prerelease
             })
-            const releaseAsset = await uploadReleaseAsset({
+            const releaseAsset = await github.repos.uploadReleaseAsset({
                 owner, repo,
                 release_id: release.data.id,
                 url: release.data.upload_url,
                 name: `${kernelName}-${version}.zip`,
                 headers: {
-                    'content-length': artficat.byteLength,
+                    'content-length': artifact.byteLength,
                     'content-type': 'application/zip',
                 },
-                data
+                data: artifact
             })
             return releaseAsset.data.browser_download_url
         }

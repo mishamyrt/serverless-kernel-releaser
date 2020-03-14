@@ -1,4 +1,4 @@
-const { createReply } = require('./formaters.js')
+const { createReply, formatGist } = require('./formaters.js')
 const { parseMessage, sha1 } = require('./helpers.js')
 const { useGitHub } = require('./github.js')
 
@@ -20,25 +20,34 @@ const {
 
 exports.input = async request => {
     const { message } = JSON.parse(request.body)
-    const reply = createReply(message.chat.id, message.message_id)
-    if (message.chat.username !== owner) {
-        return reply(`@${message.chat.username} is torturing me`)
+    const ownerMessage = message.chat.username === owner
+    const reply = createReply(message.chat.id, message.message_id, ownerMessage)
+    if (!ownerMessage) {
+        return reply(`🤬 @${message.chat.username} is torturing me`)
     }
+    try {
+        const [ version, changelog ] = parseMessage(message.text)
+        const prerelease = version.includes('beta')
+        const artifactId = await getArtifactId()
+        const artifact = await downloadArtifact(artifactId)
+        const artifactUrl = await createRelease(version, changelog, artifact, prerelease)
 
-    const [ version, changelog ] = parseMessage(message.text)
-    const prerelease = version.includes('beta')
-    const artifactId = await getArtifactId()
-    const artifact = await downloadArtifact(artifactId)
-    const artifactUrl = await createRelease(version, changelog, artficat, prerelease)
-
-    await updateGist(prerelease ? betaGistId : productionGistId, formatGist(
-        owner,
-        gistId,
-        kernelName,
-        version,
-        artifactUrl,
-        sha1(artifact),
-        supportUrl,
-        changelog
-    ))
+        const gistId = prerelease ? betaGistId : productionGistId
+    
+        await updateGist(gistId, formatGist(
+            owner,
+            gistId,
+            kernelName,
+            version,
+            artifactUrl,
+            sha1(artifact),
+            supportUrl,
+            changelog,
+            prerelease
+        ))
+    return reply(`🤘 Successfully created`)
+    } catch (e) {
+        console.error(e)
+        return reply(`🔥 Could not create release`)
+    }
 }

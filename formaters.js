@@ -5,32 +5,32 @@ const getDate = () => new Date().toISOString().substring(0, 10)
 const getTimestamp = () => new Date().getTime()
 
 const capitalize = str =>
-    str.toUpperCase() + str.slice(1)
+    str.toUpperCase().slice(0, 1) + str.slice(1)
 
 const getChangelogUrl = (owner, gistId) =>
     `${gistUrl}/${owner}/${gistId}/raw/changelog.md?${getTimestamp()}`
 
-const createReply = (chat_id, message_id) =>
+const createReply = (chat_id, message_id, ownerMessage) =>
     message => ({
         statusCode: 200,
         headers: {
             'Content-Type': 'application/json'
         },
-        body: {
+        body: JSON.stringify({
             method: 'sendMessage',
             chat_id: chat_id, 
-            reply_to_message_id : message_id, 
+            reply_to_message_id : ownerMessage ? message_id : null, 
             text : `${message}`
-        },
+        }),
         isBase64Encoded: false
     })
 
-const formatGist = (owner, gistId, kernelName, version, fileUrl, fileSHA1, supportUrl, changelog) => {
-    const files = {
+const formatGist = (owner, gistId, kernelName, version, fileUrl, fileSHA1, supportUrl, changelog, prerelease) => {
+    return {
         'fkm.json': {
-            content: {
+            content: JSON.stringify({
                 kernel: {
-                    name: `${capitalize(kernelName)} ${!isRelease ? ' Beta' : ''}`,
+                    name: `${capitalize(kernelName)} ${prerelease ? ' Beta' : ''}`,
                     date: getDate(),
                     changelog_url: getChangelogUrl(owner, gistId),
                     link: fileUrl,
@@ -40,7 +40,7 @@ const formatGist = (owner, gistId, kernelName, version, fileUrl, fileSHA1, suppo
                 support: {
                     link: supportUrl
                 }
-            },
+            }),
             filename: `${kernelName}.json`
         },
         'changelog.md': {
@@ -48,7 +48,6 @@ const formatGist = (owner, gistId, kernelName, version, fileUrl, fileSHA1, suppo
             filename: 'changelog.md'
         }
     }
-    return { files }
 }
 
 module.exports = {

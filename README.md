@@ -35,7 +35,7 @@ curl -F "url=https://functions.yandexcloud.net/$FUNCTION_ID" "https://api.telegr
 Open chat with bot and write something like this using Markdown:
 
 ```
-v1.5-beta2
+1.5-beta2
 
 Some description
 
