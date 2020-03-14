@@ -1,0 +1,14 @@
+{
+  "name": "serverless-kernel-releaser",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "pack": "rm -f releaser-pack.zip && zip -r4 ./releaser-pack.zip * -x releaser-pack.zip"
+  },
+  "author": "mishamyrt",
+  "license": "ISC",
+  "dependencies": {
+    "@octokit/rest": "^16.41.1"
+  }
+}
