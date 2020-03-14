@@ -7,7 +7,7 @@
     "pack": "rm -f releaser-pack.zip && zip -r4 ./releaser-pack.zip * -x releaser-pack.zip"
   },
   "author": "mishamyrt",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@octokit/rest": "^16.41.1"
   }
