@@ -25,11 +25,6 @@ const createReply = (chat_id, message_id) =>
         isBase64Encoded: false
     })
 
-const formatRelease = (owner, gistId, fileUrl, fileSHA1, namePrefix) => {
-    const now = new Date()
-    return 
-}
-
 const formatGist = (owner, gistId, kernelName, version, fileUrl, fileSHA1, supportUrl, changelog) => {
     const files = {
         'fkm.json': {

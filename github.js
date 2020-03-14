@@ -11,8 +11,6 @@ const useGitHub = (accessToken, owner, repo, branch, kernelName) => {
                 github.actions.listRepoWorkflowRuns({ owner, repo })
             ])
             const commitSha = branchData.data.commit.sha
-            console.log(commitSha)
-            console.log(runs.data.workflow_runs)
             return runs.data.workflow_runs.filter(run => run.head_sha === commitSha)[0].id
         },
 
