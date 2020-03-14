@@ -1,0 +1,23 @@
+name: build
+
+on:
+  - push
+
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Download dependencies
+      run: npm install
+
+    - name: Pack
+      run: npm run pack
+
+    - name: Upload package
+      uses: actions/upload-artifact@v1
+      with:
+        name: pancake
+        path: releaser-pack.zip
