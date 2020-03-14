@@ -4,9 +4,6 @@ const getDate = () => new Date().toISOString().substring(0, 10)
 
 const getTimestamp = () => new Date().getTime()
 
-const capitalize = str =>
-    str.toUpperCase().slice(0, 1) + str.slice(1)
-
 const getChangelogUrl = (owner, gistId) =>
     `${gistUrl}/${owner}/${gistId}/raw/changelog.md?${getTimestamp()}`
 
@@ -25,12 +22,12 @@ const createReply = (chat_id, message_id, ownerMessage) =>
         isBase64Encoded: false
     })
 
-const formatGist = (owner, gistId, kernelName, version, fileUrl, fileSHA1, supportUrl, changelog, prerelease) => {
+const formatGist = (owner, gistId, kernelName, kernelDisplayName, version, fileUrl, fileSHA1, supportUrl, changelog, prerelease) => {
     return {
         'fkm.json': {
             content: JSON.stringify({
                 kernel: {
-                    name: `${capitalize(kernelName)} ${prerelease ? ' Beta' : ''}`,
+                    name: `${kernelDisplayName} ${prerelease ? ' Beta' : ''}`,
                     date: getDate(),
                     changelog_url: getChangelogUrl(owner, gistId),
                     link: fileUrl,

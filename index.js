@@ -7,6 +7,7 @@ const owner = process.env.OWNER
 const branch = process.env.BRANCH
 const repository = process.env.REPOSITORY
 const kernelName = process.env.KERNEL_NAME
+const kernelDisplayName = process.env.KERNEL_DISPLAY_NAME
 const productionGistId = process.env.PROD_GIST_ID
 const betaGistId = process.env.BETA_GIST_ID
 const supportUrl = process.env.SUPPORT_URL
@@ -23,7 +24,7 @@ exports.input = async request => {
     const ownerMessage = message.chat.username === owner
     const reply = createReply(message.chat.id, message.message_id, ownerMessage)
     if (!ownerMessage) {
-        return reply(`🤬 @${message.chat.username} is torturing me`)
+        return reply(`🤬 Not allowed for you. Only @${owner} can do that`)
     }
     try {
         const [ version, changelog ] = parseMessage(message.text)
@@ -38,6 +39,7 @@ exports.input = async request => {
             owner,
             gistId,
             kernelName,
+            kernelDisplayName,
             version,
             artifactUrl,
             sha1(artifact),
